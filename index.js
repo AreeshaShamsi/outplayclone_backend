@@ -24,6 +24,10 @@ db.connect((err) => {
     console.log("✅ Database connected successfully!");
   }
 });
+app.get("/", (req, res) => {
+  res.send("Backend is live ✅");
+});
+
 
 // Health check route
 app.get("/check-db", (req, res) => {
