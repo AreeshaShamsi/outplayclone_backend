@@ -1,9 +1,12 @@
 import express from "express";
-import { getLeads, createLead } from "../controllers/LeadController.js";
+import { getLeads, createLead, updateLead, deleteLead } from "../controllers/LeadController.js";
 
 const router = express.Router();
 
-router.get("/", getLeads);
-router.post("/", createLead);
+// CRUD routes
+router.get("/", getLeads);             // GET all
+router.post("/create", createLead);    // CREATE
+router.put("/update/:id", updateLead); // UPDATE
+router.delete("/delete/:id", deleteLead); // DELETE
 
 export default router;
