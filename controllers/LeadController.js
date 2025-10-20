@@ -1,6 +1,8 @@
 import db from "../config/db.js";
 
+// ============================
 // Get all leads
+// ============================
 export const getLeads = (req, res) => {
   db.query("SELECT * FROM leads", (err, results) => {
     if (err) return res.status(500).json({ error: err });
@@ -8,30 +10,30 @@ export const getLeads = (req, res) => {
   });
 };
 
+// ============================
 // Create new lead
+// ============================
 export const createLead = (req, res) => {
   const {
-    leadOwner,
+    name,
     company,
-    firstName,
-    lastName,
+    first_name,
+    last_name,
     title,
     email,
     phone,
-    fax,
-    mobile,
     website,
-    leadSource,
-    leadStatus,
+    lead_source,
+    lead_status,
     industry,
-    employees,
-    revenue,
+    num_employees,
+    annual_revenue,
     rating,
     description,
     address,
     country,
-    houseNo,
-    street,
+    flat_house,
+    street_address,
     city,
     state,
     zip
@@ -46,9 +48,9 @@ export const createLead = (req, res) => {
   `;
 
   const values = [
-    leadOwner, email, phone, company, firstName, lastName, title, website, leadSource,
-    leadStatus, industry, employees, revenue, rating, description, address,
-    country, houseNo, street, city, state, zip
+    name, email, phone, company, first_name, last_name, title, website, lead_source,
+    lead_status, industry, num_employees, annual_revenue, rating, description, address,
+    country, flat_house, street_address, city, state, zip
   ];
 
   db.query(sql, values, (err, result) => {
@@ -57,76 +59,28 @@ export const createLead = (req, res) => {
   });
 };
 
+// ============================
+// UPDATE a lead (partial updates supported)
+// ============================
 export const updateLead = (req, res) => {
   const { id } = req.params;
-  const {
-    leadOwner,
-    company,
-    firstName,
-    lastName,
-    title,
-    email,
-    phone,
-    fax,
-    mobile,
-    website,
-    leadSource,
-    leadStatus,
-    industry,
-    employees,
-    revenue,
-    rating,
-    description,
-    address,
-    country,
-    houseNo,
-    street,
-    city,
-    state,
-    zip,
-  } = req.body;
+  const updatedData = { ...req.body }; // only the fields sent by frontend
 
-  const sql = `
-    UPDATE leads
-    SET
-      name = ?, email = ?, phone = ?, company = ?, first_name = ?, last_name = ?, title = ?, 
-      website = ?, lead_source = ?, lead_status = ?, industry = ?, num_employees = ?, 
-      annual_revenue = ?, rating = ?, description = ?, address = ?, country = ?, 
-      flat_house = ?, street_address = ?, city = ?, state = ?, zip = ?
-    WHERE id = ?
-  `;
+  // If no fields sent, return error
+  if (Object.keys(updatedData).length === 0) {
+    return res.status(400).json({ error: "No fields provided for update" });
+  }
 
-  const values = [
-    leadOwner,
-    email,
-    phone,
-    company,
-    firstName,
-    lastName,
-    title,
-    website,
-    leadSource,
-    leadStatus,
-    industry,
-    employees,
-    revenue,
-    rating,
-    description,
-    address,
-    country,
-    houseNo,
-    street,
-    city,
-    state,
-    zip,
-    id,
-  ];
-
-  db.query(sql, values, (err, result) => {
-    if (err) return res.status(500).json({ error: "Error updating lead" });
+  const sql = "UPDATE leads SET ? WHERE id = ?";
+  db.query(sql, [updatedData, id], (err, result) => {
+    if (err) {
+      console.error("SQL ERROR:", err); // log real error
+      return res.status(500).json({ error: "Error updating lead" });
+    }
     if (result.affectedRows === 0)
       return res.status(404).json({ error: "Lead not found" });
-    res.json({ message: "Lead updated successfully" });
+
+    res.json({ message: "Lead updated successfully", updatedFields: updatedData });
   });
 };
 
