@@ -5,15 +5,17 @@ import db from "./config/db.js";
 import leadRoutes from "./routes/leadRoutes.js"; // Match casing exactly
 
 dotenv.config();
-// console.log(process.env.DB_NAME);
-
-// Enable CORS
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Make sure the route prefix matches your request
+// ✅ Root route
+app.get("/", (req, res) => {
+  res.send("🚀 API is running... Welcome to the Lead Management Server!");
+});
+
+// Lead routes
 app.use("/api/leads", leadRoutes);
 
 const PORT = process.env.PORT || 5000;
